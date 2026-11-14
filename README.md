@@ -7,6 +7,7 @@ Dashboard interactivo de análisis de ventas de una tienda, construido con **Str
 - KPIs: ventas totales, unidades vendidas, mejor vendedor y producto estrella
 - Filtros por producto, vendedor y rango de fechas
 - Gráficos: barras (seaborn), circulares y tendencia temporal
+- **Predicción de ventas con IA** (regresión lineal) y **crecimiento esperado**
 - Exportación del reporte filtrado a Excel
 - Basado en el notebook `Analisis_Ventas_y_Dashboard_Comercial.ipynb`
 

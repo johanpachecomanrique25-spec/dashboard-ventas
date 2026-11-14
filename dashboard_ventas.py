@@ -5,6 +5,7 @@ Ejecutar con: streamlit run dashboard_ventas.py
 
 from io import BytesIO
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -201,6 +202,67 @@ ax5.set_xlabel("Fecha")
 ax5.set_ylabel("Ventas")
 ax5.grid(True)
 st.pyplot(fig5)
+
+st.divider()
+
+# ──────────────────────────────────────────────
+# 14. Predicción de ventas (IA) + crecimiento esperado
+# Modelo: regresión lineal sobre la tendencia diaria
+# ──────────────────────────────────────────────
+st.subheader("🔮 Predicción de ventas (IA)")
+
+dias_horizonte = st.slider("📅 Días a pronosticar", 1, 14, 7)
+
+# Serie diaria -> variables para el modelo
+x_hist = (
+    (ventas_fecha.index - ventas_fecha.index.min()).days.values.astype(float)
+)
+y_hist = ventas_fecha.values.astype(float)
+
+# Entrenamiento del modelo (regresión lineal por mínimos cuadrados)
+pendiente, intercepto = np.polyfit(x_hist, y_hist, 1)
+
+# Proyección de los próximos días
+x_fut = np.arange(x_hist.max() + 1, x_hist.max() + 1 + dias_horizonte)
+y_fut = np.maximum(pendiente * x_fut + intercepto, 0)  # no permitir ventas negativas
+fechas_fut = ventas_fecha.index.min() + pd.to_timedelta(x_fut, unit="D")
+
+# Crecimiento esperado: promedio pronóstico vs promedio histórico
+prom_hist = y_hist.mean()
+prom_fut = y_fut.mean()
+crecimiento_esperado = ((prom_fut - prom_hist) / prom_hist) * 100 if prom_hist else 0
+
+k1, k2, k3, k4 = st.columns(4)
+k1.metric("📊 Promedio diario histórico", f"S/ {prom_hist:,.0f}")
+k2.metric("🔮 Promedio diario proyectado", f"S/ {prom_fut:,.0f}")
+k3.metric(
+    "📈 Crecimiento esperado",
+    f"{crecimiento_esperado:+.1f}%",
+    delta=f"{crecimiento_esperado:+.1f}%",
+)
+k4.metric("🗓️ Ventas proyectadas próximas", f"S/ {y_fut.sum():,.0f}")
+
+fig6, ax6 = plt.subplots(figsize=(10, 5))
+ax6.plot(
+    ventas_fecha.index, ventas_fecha.values,
+    marker="o", color="tab:blue", label="Ventas reales",
+)
+ax6.plot(
+    fechas_fut, y_fut,
+    marker="s", linestyle="--", color="tab:orange", label="Pronóstico (IA)",
+)
+ax6.set_title(f"Predicción de ventas para los próximos {dias_horizonte} días")
+ax6.set_xlabel("Fecha")
+ax6.set_ylabel("Ventas")
+ax6.legend()
+ax6.grid(True)
+st.pyplot(fig6)
+
+st.caption(
+    "🤖 El modelo usa regresión lineal: aprende la tendencia de las ventas "
+    "diarias históricas y la extiende hacia el futuro. Mientras más datos "
+    "tenga la tienda, más precisa será la predicción."
+)
 
 st.divider()
 
