@@ -1,0 +1,15 @@
+# Archivos con datos sensibles (no deben subirse a GitHub)
+citas-guardadoenbd-y-migraci-n-mysql.json
+sesi-n-eliminada-con-p-gina-react.json
+
+# Entorno Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Reportes generados
+*.xlsx
+
+# Configuración local
+.streamlit/secrets.toml
